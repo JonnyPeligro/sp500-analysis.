@@ -1,0 +1,43 @@
+import pandas as pd
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
+
+# Configura los parámetros de conexión
+server = 'LAPTOP-F4BTSP5O\\SQLEXPRESS'
+database = 'Etapa3'
+username = 'Jonnathan_Bases_de_Datos'
+password = 'Thetrooper123'
+driver = 'ODBC Driver 17 for SQL Server'
+
+# Cadena de conexión
+engine = create_engine(f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver={driver}')
+
+# Función para cargar datos a una tabla
+def load_data_to_sql(engine, df, table_name):
+    try:
+        df.to_sql(table_name, con=engine, index=False, if_exists='append')
+        print(f"Datos cargados correctamente en la tabla {table_name}")
+    except Exception as e:
+        print(f"Error al cargar datos en la tabla {table_name}: {str(e)}")
+
+# Ejemplo de uso
+if __name__ == "__main__":
+    # Ejemplo de lectura de CSV para ambas tablas
+    df = pd.read_csv('prueba.csv')
+    
+    # Nombre de la primera tabla
+    table_name_company_profiles = 'CompanyProfiles'
+    
+    # Filtra los datos para la primera tabla (ejemplo, asumiendo columnas diferentes)
+    df_company_profiles = df[['Symbol', 'Company', 'Sector', 'Headquarters', 'FoundedYear']]  # Ajusta las columnas según tu CSV
+    
+    # Llama a la función para cargar los datos en la primera tabla
+    load_data_to_sql(engine, df_company_profiles, table_name_company_profiles)
+
+    # Nombre de la segunda tabla
+    table_name_companies = 'Companies'
+    
+    # Filtra los datos para la segunda tabla (ejemplo, asumiendo columnas diferentes)
+    df_companies = df[['Symbol','Fecha', 'Cierre']]  # Ajusta las columnas según tu CSV
+    
+    # Llama a la función para cargar los datos en la segunda tabla
+    load_data_to_sql(engine, df_companies, table_name_companies)
